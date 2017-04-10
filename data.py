@@ -7,3 +7,6 @@ AuAu_dict = {
     '2212': 'p',
     '2112': 'n'
 }
+
+AuAu_list_dict = {}
+AuAu_list = []
