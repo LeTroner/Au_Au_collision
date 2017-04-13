@@ -1,7 +1,23 @@
-from data import *
 import string
 import itertools
+import matplotlib.pyplot as plt
+import operator
+import numpy as np
 
+#----DECLARING CONSTANTS AND EMPTY VARIABLES
+
+AuAu_dict = {
+    '211': 'pi+',
+    '111': 'pi0',
+    '321': 'K+',
+    '311': 'K0',
+    '2212': 'p',
+    '2112': 'n'
+}
+
+AuAu_list_dict = {}
+AuAu_list = []
+#---------PROCESSES ---------
 #defining a particle counter
 def countPart(file):
     #declaring variables which will be used to store info
@@ -17,9 +33,9 @@ def countPart(file):
                 event += 1
                 #splitting the very after of the beginningofevent line
                 #the second item of the line is #of the particles
-                numberofParticle = int(f.next().split()[1])
+                numberofParticle = int(next(f).split()[1])
                 # redeclaring because above we were using the next line to skip
-                split_line = f.next().split()
+                split_line = next(f).split()
 
             #if the current line's second item
             #is the same as the numberofParticle
@@ -60,3 +76,31 @@ def avPart(event,part_dict):
     print("On average in %d"  %int(event) + " event(s) we have: ")
     print(average_dict)
     return average_dict
+
+
+#plotting the the probability of the top particles
+def plotPart(part_dict,event):
+    #declaring empyty lists
+    id = []
+    prob = []
+        #sorting out the values to see which particle has the most probability
+    #sorting a list, because of d.items(), and checkin each and every element
+    sorted_dict = sorted(part_dict.items(), key = operator.itemgetter(1))
+    #now that everything is sorted splitting up the ID and its probabilty
+    for i in range(len(sorted_dict)):
+        if sorted_dict[i][1] > 10:
+            id.append(sorted_dict[i][0])
+            prob.append(sorted_dict[i][1])
+    # declaring a linspace of the length of the prob list
+    len_prob = np.linspace(1,len(prob),num=len(prob))
+    #plotting in bars
+    plt.bar(len_prob,prob,color = 'green')
+    #adding labels and title
+    plt.xlabel('Number of particle in increasing order')
+    plt.ylabel('The occurrence a of particle')
+    plt.title('Occurrence of particles on average in %d' %event + " event(s)")
+    #adding the ID of the current particle to each bar
+    for a, b, c in zip(len_prob,prob, id):
+        plt.text(a, b, str(c),fontsize = 5.5)
+    plt.show()
+    # showing the already plotted function
