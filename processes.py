@@ -101,6 +101,6 @@ def plotPart(part_dict,event):
     plt.title('Occurrence of particles on average in %d' %event + " event(s)")
     #adding the ID of the current particle to each bar
     for a, b, c in zip(len_prob,prob, id):
-        plt.text(a, b, str(c),fontsize = 5.5)
+        plt.text(a, b, str(c),fontsize = 12)
     plt.show()
     # showing the already plotted function
