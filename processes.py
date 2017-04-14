@@ -14,13 +14,17 @@ AuAu_dict = {
     '2212': 'p',
     '2112': 'n'
 }
-
-AuAu_list_dict = {}
 AuAu_list = []
 #---------PROCESSES ---------
-#defining a particle counter
-def countPart(file):
+#defining an element counter, and the column number
+def countElem2Dict(file):
     #declaring variables which will be used to store info
+    holding_dict_id = {}
+    holding_list_x = []
+    holding_list_y = []
+    holding_list_z = []
+    holding_list_nrg = []
+    holding_list_id = []
     particle_list = []
     particle = 0
     event = 0
@@ -47,21 +51,31 @@ def countPart(file):
                 #else, there is an error with the amount of
                 #particles said and been
                 print(" Error 1")
-            #the current particle ID is the second item
-            #of the split_line
+            #the current column's item is what we are looking for
             particle = int(split_line[1])
+            mom_x = float(split_line[4])
+            mom_y = float(split_line[5])
+            mom_z = float(split_line[6])
+            energy = float(split_line[7])
             #if its not in the dict yet
             #set its value to 1
-            if particle not in AuAu_list_dict:
-                AuAu_list_dict[particle] = 1
+            if particle not in holding_dict_id:
+                holding_dict_id[particle] = 1
             #else, increase its value by one
             else:
-                AuAu_list_dict[particle] += 1
-    return event
+                holding_dict_id[particle] += 1
+            #appending each element to each list
+            holding_list_id.append(particle)
+            holding_list_x.append(mom_x)
+            holding_list_y.append(mom_y)
+            holding_list_z.append(mom_z)
+            holding_list_nrg.append(energy)
+    #returning the event number, particle id, energy,px,py and pz
+    return event,holding_dict_id,holding_list_id,holding_list_x,holding_list_y,holding_list_z,holding_list_nrg
 
 
 
-#average particle per event
+#average item per event
 def avPart(event,part_dict):
 #making event to float in order to get
 #exact number
@@ -104,3 +118,39 @@ def plotPart(part_dict,event):
         plt.text(a, b, str(c),fontsize = 12)
     plt.show()
     # showing the already plotted function
+
+#getting the mass of a particle
+def get_Mass(id,px,py,pz,energy,event):
+    #holding list for mass this will be returned
+    massList = []
+    id_mass_dict = {}
+    #looping thru the length of a list
+    #it doesnt matter which one because
+    #they containing the same amount of elements
+    for i in range(len(px)):
+        #getting mass of a particle is
+        #(m=sqrt(E^2-px^2-py^2-pz^2))
+        try:
+            #sometimes here a problem occurs that
+            #we get negative square root but when recalculated
+            #even though it is not true
+            mass = (energy[i]**2-px[i]**2-py[i]**2-pz[i]**2)**0.5
+            massList.append(mass)
+            nrg = energy[i]
+            x = px[i]
+            y = py[i]
+            z = pz[i]
+        except ValueError:
+            #checking if the problem above occured is true or not
+            if mass == (nrg**2-x**2-y**2-z**2)**0.5:
+                id_mass_dict[id[i]] = mass
+            else:
+                print('Error 2')
+        #after we add every mass to each particle
+        if id[i] not in id_mass_dict:
+            id_mass_dict[id[i]] = mass
+        else:
+            id_mass_dict[id[i]] += mass
+    #using the above declared average calculator
+    id_mass_dict =avPart(event,id_mass_dict)
+    return id_mass_dict

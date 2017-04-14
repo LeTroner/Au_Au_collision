@@ -2,6 +2,7 @@ from processes import *
 
 #----------MAIN ---------
 
-event = countPart("AuAu_1000_b_09_10.txt")
-average = avPart(event,AuAu_list_dict)
-plotPart(average,event)
+event, ID_dict,ID_list, X_list, Y_list, Z_list, NRG_list = countElem2Dict("AuAu_cut.txt")
+average = avPart(event,ID_dict)
+#plotPart(average,event)
+mass = get_Mass(ID_list,X_list, Y_list, Z_list, NRG_list,event)
