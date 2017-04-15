@@ -17,6 +17,7 @@ AuAu_dict = {
 AuAu_list = []
 #---------PROCESSES ---------
 #defining an element counter, and the column number
+
 def countElem2Dict(file):
     #declaring variables which will be used to store info
     holding_dict_id = {}
@@ -93,7 +94,7 @@ def avPart(event,part_dict):
 
 
 #plotting the the probability of the top particles
-def plotPart(part_dict,event):
+def plotPart(part_dict,event,floor):
     #declaring empyty lists
     id = []
     prob = []
@@ -102,7 +103,7 @@ def plotPart(part_dict,event):
     sorted_dict = sorted(part_dict.items(), key = operator.itemgetter(1))
     #now that everything is sorted splitting up the ID and its probabilty
     for i in range(len(sorted_dict)):
-        if sorted_dict[i][1] > 10:
+        if sorted_dict[i][1] > floor:
             id.append(sorted_dict[i][0])
             prob.append(sorted_dict[i][1])
     # declaring a linspace of the length of the prob list
@@ -111,16 +112,23 @@ def plotPart(part_dict,event):
     plt.bar(len_prob,prob,color = 'green')
     #adding labels and title
     plt.xlabel('Number of particle in increasing order')
-    plt.ylabel('The occurrence a of particle')
-    plt.title('Occurrence of particles on average in %d' %event + " event(s)")
+    #the floor is where we are looking
+    #for example, a mass value is unlikely to be above
+    #1, if more methods are added, this can be splitted too
+    if floor > 1:
+        plt.ylabel('The occurrence of particle')
+        plt.title('Occurrence of particles on average in %d' %event + " event(s)")
+    else:
+        plt.ylabel('The average mass of a particle')
+        plt.title('The average mass of particles in %d' %event + " event(s)")
     #adding the ID of the current particle to each bar
     for a, b, c in zip(len_prob,prob, id):
-        plt.text(a, b, str(c),fontsize = 12)
+        plt.text(a, b, str(c),fontsize = 10)
     plt.show()
     # showing the already plotted function
 
 #getting the mass of a particle
-def get_Mass(id,px,py,pz,energy,event):
+def get_Mass(id,id_dict,px,py,pz,energy,event):
     #holding list for mass this will be returned
     massList = []
     id_mass_dict = {}
@@ -151,6 +159,11 @@ def get_Mass(id,px,py,pz,energy,event):
             id_mass_dict[id[i]] = mass
         else:
             id_mass_dict[id[i]] += mass
+    #when every mass is added, we divide the the amount of mass by the
+    #above calculated occurrence
+    for n in id_mass_dict:
+        average_mass = id_mass_dict.get(n) / id_dict.get(n)
+        id_mass_dict[n] = average_mass
     #using the above declared average calculator
     id_mass_dict =avPart(event,id_mass_dict)
     return id_mass_dict
