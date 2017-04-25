@@ -94,43 +94,58 @@ def avPart(event,part_dict):
 
 
 #plotting the the probability of the top particles
-def plotPart(part_dict,event,floor):
+def plotPart(id_dict,part_dict,event,floor):
     #declaring empyty lists
-    id = []
-    prob = []
-        #sorting out the values to see which particle has the most probability
-    #sorting a list, because of d.items(), and checkin each and every element
-    sorted_dict = sorted(part_dict.items(), key = operator.itemgetter(1))
-    #now that everything is sorted splitting up the ID and its probabilty
-    for i in range(len(sorted_dict)):
-        if sorted_dict[i][1] > floor:
-            id.append(sorted_dict[i][0])
-            prob.append(sorted_dict[i][1])
-    # declaring a linspace of the length of the prob list
-    len_prob = np.linspace(1,len(prob),num=len(prob))
-    #plotting in bars
-    plt.bar(len_prob,prob,color = 'green')
-    #adding labels and title
-    plt.xlabel('Number of particle in increasing order')
+    part_key = []
+    part_val = []
     #the floor is where we are looking
     #for example, a mass value is unlikely to be above
     #1, if more methods are added, this can be splitted too
-    if floor > 1:
+    if floor > 8:
+        # sorting out the values to see which particle has the most probability
+        # sorting a list, because of d.items(), and checkin each and every element
+        sorted_dict = sorted(part_dict.items(), key=operator.itemgetter(1))
+        # now that everything is sorted splitting up the ID and its probabilty
+        for i in range(len(sorted_dict)):
+            if sorted_dict[i][1] > floor:
+                part_key.append(sorted_dict[i][0])
+                part_val.append(sorted_dict[i][1])
+        # declaring a linspace of the length of the prob list
+        len_prob = np.linspace(1, len(part_val), num=len(part_val))
+        # plotting in bars
+        plt.bar(len_prob, part_val, color='green')
+        # adding labels and title
+        plt.xlabel('Number of particle in increasing order')
         plt.ylabel('The occurrence of particle')
         plt.title('Occurrence of particles on average in %d' %event + " event(s)")
+        for a, b, c in zip(len_prob, part_val, part_key):
+            plt.text(a, b, str(c), fontsize=10)
+        plt.show()
+        # showing the already plotted function
     else:
-        plt.ylabel('The average mass of a particle')
+        # sorting out the values to see which particle has the most probability
+        # sorting a list, because of d.items(), and checkin each and every element
+        sorted_dict = sorted(part_dict.items(), key=operator.itemgetter(1))
+        # now that everything is sorted splitting up the ID and its probabilty
+        for i in range(len(sorted_dict)):
+            if sorted_dict[i][0] > floor:
+                part_key.append(sorted_dict[i][0])
+                part_val.append(sorted_dict[i][1])
+        plt.bar(part_key,part_val)
+        plt.ylabel('The average occurence of a particle')
+        plt.xlabel('The average mass of a particle')
         plt.title('The average mass of particles in %d' %event + " event(s)")
-    #adding the ID of the current particle to each bar
-    for a, b, c in zip(len_prob,prob, id):
-        plt.text(a, b, str(c),fontsize = 10)
-    plt.show()
-    # showing the already plotted function
+        #adding the ID of the current particle to each bar
+        for a, b, c in zip(part_key,part_val, id_dict.keys()):
+            plt.text(a, b, str(c),fontsize = 10)
+        plt.show()
+        # showing the already plotted function
 
 #getting the mass of a particle
 def get_Mass(id,id_dict,px,py,pz,energy,event):
     #holding list for mass this will be returned
     massList = []
+    temp_dict = {}
     id_mass_dict = {}
     #looping thru the length of a list
     #it doesnt matter which one because
@@ -151,19 +166,27 @@ def get_Mass(id,id_dict,px,py,pz,energy,event):
         except ValueError:
             #checking if the problem above occured is true or not
             if mass == (nrg**2-x**2-y**2-z**2)**0.5:
-                id_mass_dict[id[i]] = mass
+                temp_dict[id[i]] = mass
             else:
                 print('Error 2')
         #after we add every mass to each particle
-        if id[i] not in id_mass_dict:
-            id_mass_dict[id[i]] = mass
+        if id[i] not in temp_dict:
+            temp_dict[id[i]] = mass
         else:
-            id_mass_dict[id[i]] += mass
+            temp_dict[id[i]] += mass
     #when every mass is added, we divide the the amount of mass by the
     #above calculated occurrence
-    for n in id_mass_dict:
-        average_mass = id_mass_dict.get(n) / id_dict.get(n)
-        id_mass_dict[n] = average_mass
+    for n in temp_dict:
+        average_mass = temp_dict.get(n) / id_dict.get(n)
+        temp_dict[n] = average_mass
     #using the above declared average calculator
-    id_mass_dict =avPart(event,id_mass_dict)
+    temp_dict = avPart(event,temp_dict)
+    #adding a new dict, key will be its occurence and value will be its average mass per event
+    for i in temp_dict:
+        if i not in id_mass_dict:
+            #getting the occurence of the current particle
+            #it will be key, and the value will be the average mass
+            id_mass_dict[temp_dict.get(i)] = id_dict.get(i)
+        else:
+            print(' Error 3')
     return id_mass_dict
