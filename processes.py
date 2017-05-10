@@ -131,13 +131,15 @@ def plotPart(id_dict,part_dict,event,floor):
             if sorted_dict[i][0] > floor:
                 part_key.append(sorted_dict[i][0])
                 part_val.append(sorted_dict[i][1])
-        plt.bar(part_key,part_val)
+        plt.plot(part_key,part_val,'g*',markersize=12)
         plt.ylabel('The average occurence of a particle')
         plt.xlabel('The average mass of a particle')
         plt.title('The average mass of particles in %d' %event + " event(s)")
         #adding the ID of the current particle to each bar
-        for a, b, c in zip(part_key,part_val, id_dict.keys()):
+        '''for a, b, c in zip(part_key,part_val, id_dict.keys()):
             plt.text(a, b, str(c),fontsize = 10)
+        '''
+        plt.yscale('log')
         plt.show()
         # showing the already plotted function
 
